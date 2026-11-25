@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CheckCircle2, Mic, ShieldAlert, Volume2, X } from "lucide-react";
+import { Mic, Volume2, X } from "lucide-react";
 import { useAudioInputManager } from "../../hooks/useAudioInputManager";
 import type { AudioInputMode } from "../../services/AudioInputManager";
 
@@ -49,21 +49,21 @@ export const AudioCompatModal: React.FC<AudioCompatModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-xl rounded-2xl border border-slate-700/80 bg-navy-900 p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-slate-900">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-slate-100">
+            <h3 className="font-display text-base font-bold text-slate-900">
               Microphone & Audio Compatibility Lab
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Test Zoom Video SDK microphone ownership vs. AI speech capture.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+            className="rounded-xl border border-slate-200 p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
           >
             <X className="h-4 w-4" />
           </button>
@@ -71,8 +71,8 @@ export const AudioCompatModal: React.FC<AudioCompatModalProps> = ({
 
         <div className="space-y-4">
           {/* Mode selector */}
-          <div className="rounded-xl border border-slate-800 bg-navy-950/80 p-3">
-            <label className="mb-2 block text-xs font-medium text-slate-300">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-600">
               Active Audio Input Architecture
             </label>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -99,131 +99,100 @@ export const AudioCompatModal: React.FC<AudioCompatModalProps> = ({
                   key={opt.id}
                   type="button"
                   onClick={() => audio.setMode(opt.id)}
-                  className={`rounded-xl border p-2.5 text-left transition ${
+                  className={`rounded-xl p-3 text-left transition ${
                     audio.mode === opt.id
-                      ? "border-accent-teal bg-accent-teal/10 text-teal-200"
-                      : "border-slate-800 bg-navy-900 text-slate-300 hover:border-slate-700"
+                      ? "border-2 border-blue-600 bg-blue-50 text-blue-900 shadow-sm"
+                      : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                   }`}
                 >
-                  <div className="text-xs font-semibold">{opt.title}</div>
-                  <div className="mt-0.5 text-[11px] text-slate-400">{opt.desc}</div>
+                  <div className="text-xs font-bold">{opt.title}</div>
+                  <div className="mt-1 text-[10px] text-slate-500 leading-normal">{opt.desc}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Hardware & Zoom status */}
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-xl border border-slate-800 bg-navy-950/70 p-3 space-y-1">
-              <div className="text-slate-400">Browser Support</div>
-              <div className="flex items-center gap-1.5 text-slate-200">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                SpeechRecognition:{" "}
-                {audio.speechRecognitionSupported ? "Supported" : "Unavailable (MediaRecorder used)"}
-              </div>
-              <div className="text-slate-300">Permission: {audio.permissionState}</div>
-              <div className="text-slate-300">Current Owner: {audio.activeOwner}</div>
-            </div>
-
-            <div className="rounded-xl border border-slate-800 bg-navy-950/70 p-3 space-y-1">
-              <div className="text-slate-400">Zoom Audio State</div>
-              <div className="text-slate-200">
-                Session: {zoomConnected ? "Connected" : "Not Connected"}
-              </div>
-              <div className="text-slate-300">
-                Zoom Mic: {zoomAudioOn ? "Active" : "Released / Off"}
-              </div>
-              {audio.conflictDetected && (
-                <div className="flex items-center gap-1 text-amber-300">
-                  <ShieldAlert className="h-3.5 w-3.5" /> Conflict detected earlier
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Interactive test actions */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => void inspectMicrophones()}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700"
-            >
-              1. Inspect Mics
-            </button>
-            {zoomConnected && !zoomAudioOn && (
+          {/* Diagnostics Actions */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={() => void onEnableZoomAudio()}
-                className="rounded-lg border border-blue-500/40 bg-blue-500/15 px-3 py-1.5 text-xs font-medium text-blue-200 hover:bg-blue-500/25"
+                onClick={() => void inspectMicrophones()}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm"
               >
-                2. Start Zoom Audio
+                <Mic className="h-3.5 w-3.5 text-blue-600" />
+                Inspect Mics ({devices.length})
               </button>
-            )}
-            {zoomConnected && zoomAudioOn && (
-              <button
-                type="button"
-                onClick={() => void onDisableZoomAudio()}
-                className="rounded-lg border border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-500/25"
-              >
-                Release Zoom Audio
-              </button>
-            )}
-            {audio.recordingState === "idle" ? (
+
               <button
                 type="button"
                 onClick={() => void runVoiceCaptureTest()}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-accent-teal px-3 py-1.5 text-xs font-semibold text-navy-950 hover:bg-teal-400"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 px-3 py-1.5 text-xs font-bold text-white shadow-sm"
               >
-                <Mic className="h-3.5 w-3.5" />
-                3. Test Speech Capture
+                <Volume2 className="h-3.5 w-3.5" />
+                Test Voice Capture
               </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => void audio.stopPushToTalk((t) => setSampleTranscript(t))}
-                className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500"
-              >
-                Stop & Transcribe
-              </button>
+
+              {zoomConnected && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (zoomAudioOn) {
+                      void onDisableZoomAudio();
+                    } else {
+                      void onEnableZoomAudio();
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm"
+                >
+                  {zoomAudioOn ? "Release Zoom Audio" : "Acquire Zoom Audio"}
+                </button>
+              )}
+            </div>
+
+            {sampleTranscript && (
+              <div className="rounded-xl border border-teal-200 bg-teal-50 p-2.5 text-xs text-teal-900 font-medium">
+                Captured speech: &ldquo;{sampleTranscript}&rdquo;
+              </div>
             )}
-            <button
-              type="button"
-              onClick={() => audio.speakText("LearnMate audio playback check is working.")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-navy-850 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
-            >
-              <Volume2 className="h-3.5 w-3.5" />
-              Test TTS
-            </button>
+
+            {devices.length > 0 && (
+              <div className="space-y-1 text-xs">
+                <div className="font-bold text-slate-700 uppercase tracking-wider text-[10px]">
+                  Detected Microphones:
+                </div>
+                {devices.map((d, i) => (
+                  <div key={d.deviceId || i} className="font-mono text-[11px] text-slate-600">
+                    • {d.label || `Microphone ${i + 1}`}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {devices.length > 0 && (
-            <div className="text-[11px] text-slate-400">
-              Devices:{" "}
-              {devices.map((d, i) => d.label || `Microphone ${i + 1}`).join(" • ")}
-            </div>
-          )}
-
-          {(audio.interimTranscript || sampleTranscript) && (
-            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-xs text-emerald-200">
-              Captured transcript:{" "}
-              <span className="font-medium">{sampleTranscript || audio.interimTranscript}</span>
-            </div>
-          )}
-
-          {audio.error && (
-            <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-2.5 text-xs text-rose-200">
-              {audio.error}
-            </div>
-          )}
-
-          {/* Diagnostic log */}
-          <div className="max-h-36 overflow-y-auto rounded-xl border border-slate-800 bg-navy-950 p-2.5 font-mono text-[11px] text-slate-400">
+          {/* Diagnostic Log Output */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-900 p-3 text-xs text-slate-300 font-mono max-h-36 overflow-y-auto">
+            <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Live Diagnostics:</div>
             {audio.diagnosticLogs.length === 0 ? (
-              <span>Diagnostic log is empty. Run steps 1–3 above to verify hardware behavior.</span>
+              <div className="text-slate-600">No events logged yet.</div>
             ) : (
-              audio.diagnosticLogs.map((line, idx) => <div key={idx}>{line}</div>)
+              audio.diagnosticLogs.map((log: string, i: number) => (
+                <div key={i} className="text-[11px] leading-relaxed">
+                  {log}
+                </div>
+              ))
             )}
           </div>
+        </div>
+
+        <div className="mt-5 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-xs font-bold text-white shadow-sm transition"
+          >
+            Close Audio Lab
+          </button>
         </div>
       </div>
     </div>

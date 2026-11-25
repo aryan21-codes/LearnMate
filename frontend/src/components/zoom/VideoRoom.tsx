@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  AlertTriangle,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -69,16 +67,16 @@ export const VideoRoom: React.FC<VideoRoomProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded-2xl border border-slate-800/90 bg-navy-900/70 p-2.5 sm:p-3">
+    <div className="flex flex-col gap-2.5 rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-sm">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-accent-blue/15 text-accent-blue">
-            <Video className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-blue-50 text-blue-600 shadow-sm">
+            <Video className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-xs font-semibold text-slate-100">Study Room Camera</h2>
-            <p className="text-[10px] text-slate-400">
-              Zoom Video SDK • <span className="font-mono text-slate-300">{sessionTopic}</span>
+            <h2 className="text-xs font-bold text-slate-900 tracking-tight">Study Room Camera Feed</h2>
+            <p className="text-[10px] text-slate-500 font-medium">
+              Zoom Video SDK • <span className="font-mono text-slate-700">{sessionTopic}</span>
             </p>
           </div>
         </div>
@@ -87,95 +85,112 @@ export const VideoRoom: React.FC<VideoRoomProps> = ({
           <button
             type="button"
             onClick={onRunAudioCompatTest}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-navy-850 px-2 py-0.5 text-[10px] font-medium text-slate-300 hover:border-accent-teal/50 hover:text-teal-300 transition"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-700 hover:bg-white hover:border-slate-300 transition shadow-sm"
           >
-            <Wrench className="h-3 w-3" />
-            <span className="hidden sm:inline">Compat Check</span>
+            <Wrench className="h-3 w-3 text-teal-600" />
+            <span className="hidden sm:inline">Audio Lab</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsCollapsed((c) => !c)}
             title={isCollapsed ? "Expand Camera Feed" : "Collapse Camera for More Whiteboard Space"}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-navy-850 px-2 py-0.5 text-[10px] font-medium text-slate-300 hover:border-slate-500 hover:text-white transition"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-700 hover:bg-white hover:border-slate-300 transition shadow-sm"
           >
-            {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
-            <span>{isCollapsed ? "Expand Cam" : "Minimize"}</span>
+            {isCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+            <span>{isCollapsed ? "Expand Cam" : "Compact Cam"}</span>
           </button>
-
-          <span
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-              connectionState === "connected"
-                ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
-                : connectionState === "connecting" || connectionState === "reconnecting"
-                ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
-                : "bg-slate-800 text-slate-300 border border-slate-700"
-            }`}
-          >
-            {connectionState === "connecting" || connectionState === "reconnecting" ? (
-              <Loader2 className="h-2.5 w-2.5 animate-spin" />
-            ) : connectionState === "connected" ? (
-              <CheckCircle2 className="h-2.5 w-2.5" />
-            ) : (
-              <AlertTriangle className="h-2.5 w-2.5 text-amber-400" />
-            )}
-            {connectionState === "connected"
-              ? "Live"
-              : connectionState === "connecting"
-              ? "Joining..."
-              : connectionState === "reconnecting"
-              ? "Reconnecting..."
-              : connectionState === "error"
-              ? "Setup Needed"
-              : "Idle"}
-          </span>
         </div>
       </div>
 
-      {/* Video canvas area - compact and collapsible */}
-      {!isCollapsed && (
-        <div className="relative min-h-[140px] max-h-[180px] rounded-xl border border-slate-800 bg-navy-950/90 p-2 flex flex-col justify-center overflow-hidden">
-          <video-player-container ref={(el: HTMLElement | null) => attachContainer(el)} />
-
-          {connectionState === "connecting" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-navy-950/80 backdrop-blur-sm">
-              <Loader2 className="h-6 w-6 animate-spin text-accent-blue" />
-              <p className="text-[11px] text-slate-300">
-                Requesting server-side Zoom JWT & joining room...
-              </p>
-            </div>
-          )}
-
-          {connectionState === "error" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-navy-950/95 p-3 text-center">
-              <AlertTriangle className="h-6 w-6 text-amber-400" />
-              <div className="max-w-md space-y-1">
-                <p className="text-xs font-semibold text-slate-100">
-                  {configMissing
-                    ? "Zoom Video SDK Credentials Not Configured"
-                    : "Zoom Video Connection Issue"}
-                </p>
-                <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">{error}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  joinSession({
-                    sessionId,
-                    sessionTopic,
-                    userName,
-                    startVideo: true,
-                  })
-                }
-                className="inline-flex items-center gap-1 rounded-lg bg-accent-blue px-2.5 py-1 text-[11px] font-medium text-white hover:bg-blue-500"
-              >
-                <RefreshCw className="h-3 w-3" />
-                Retry Zoom Join
-              </button>
-            </div>
-          )}
+      {configMissing && (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 shadow-sm">
+          <strong>Zoom SDK Keys Not Detected:</strong> Real-time Zoom video requires
+          <code className="mx-1 rounded bg-amber-100 px-1 py-0.5 font-mono text-[11px]">ZOOM_SDK_KEY</code>
+          and
+          <code className="mx-1 rounded bg-amber-100 px-1 py-0.5 font-mono text-[11px]">
+            ZOOM_SDK_SECRET
+          </code>
+          in <code className="font-mono">backend/.env</code>. The AI tutor voice & whiteboard remain fully active!
         </div>
       )}
+
+      {error && (
+        <div className="flex items-center justify-between rounded-2xl border border-rose-300 bg-rose-50 px-3.5 py-2 text-xs text-rose-900 shadow-sm">
+          <span className="truncate">{error}</span>
+          <button
+            type="button"
+            onClick={() =>
+              joinSession({
+                sessionId,
+                sessionTopic,
+                userName,
+                startVideo: true,
+              })
+            }
+            className="inline-flex items-center gap-1 rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-800 hover:bg-rose-200"
+          >
+            <RefreshCw className="h-3 w-3" /> Retry
+          </button>
+        </div>
+      )}
+
+      {/* Video Viewport: Collapsible & High-contrast */}
+      <div
+        className={`relative overflow-hidden rounded-2xl border border-slate-800 bg-[#070b14] shadow-inner transition-all duration-300 ${
+          isCollapsed ? "h-0 border-0 opacity-0 p-0 m-0 overflow-hidden" : "h-[160px] sm:h-[190px] w-full"
+        }`}
+      >
+        <div
+          ref={(node) => {
+            if (node) attachContainer(node);
+          }}
+          className="h-full w-full"
+        />
+
+        {connectionState === "connecting" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-sm text-slate-300">
+            <Loader2 className="mb-2 h-6 w-6 animate-spin text-blue-500" />
+            <p className="text-xs font-semibold">Joining Zoom video room...</p>
+          </div>
+        )}
+
+        {connectionState === "disconnected" && !configMissing && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/85 p-4 text-center">
+            <p className="text-xs font-semibold text-slate-300">Camera Disconnected</p>
+            <button
+              type="button"
+              onClick={() =>
+                joinSession({
+                  sessionId,
+                  sessionTopic,
+                  userName,
+                  startVideo: true,
+                })
+              }
+              className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-blue-500 transition"
+            >
+              <RefreshCw className="h-3 w-3" /> Reconnect Camera
+            </button>
+          </div>
+        )}
+
+        {/* Video status chip */}
+        <div className="pointer-events-none absolute bottom-2 left-2 flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/85 px-2 py-0.5 font-mono text-[10px] font-bold text-white shadow backdrop-blur-sm">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                connectionState === "connected"
+                  ? "bg-emerald-400"
+                  : connectionState === "connecting"
+                  ? "bg-amber-400 animate-ping"
+                  : "bg-slate-400"
+              }`}
+            />
+            {connectionState === "connected" ? "Live Feed" : connectionState}
+          </span>
+        </div>
+      </div>
 
       <ParticipantBadgeList participants={participants} />
 
@@ -186,30 +201,16 @@ export const VideoRoom: React.FC<VideoRoomProps> = ({
         zoomMuted={zoomMuted}
         audioMode={audioMode}
         onToggleVideo={() => void toggleVideo()}
-        onToggleZoomAudio={() => void toggleMuteZoomAudio()}
+        onToggleZoomAudio={() => {
+          if (!zoomAudioOn) {
+            void enableZoomAudio();
+          } else {
+            void toggleMuteZoomAudio();
+          }
+        }}
         onDisconnectZoomAudio={() => void disableZoomAudio()}
         onLeave={() => void handleLeaveAndSummarize()}
       />
-
-      {error && connectionState === "connected" && (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-          {error}
-        </div>
-      )}
-
-      {/* Hidden helper if user switches to zoom_plus_speech */}
-      {audioMode === "zoom_plus_speech" && connectionState === "connected" && !zoomAudioOn && (
-        <div className="flex items-center justify-between rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-xs text-blue-200">
-          <span>Simultaneous Zoom + SpeechRecognition mode selected.</span>
-          <button
-            type="button"
-            onClick={() => void enableZoomAudio()}
-            className="rounded bg-blue-600 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-blue-500"
-          >
-            Start Zoom Mic
-          </button>
-        </div>
-      )}
     </div>
   );
 };

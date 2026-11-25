@@ -88,16 +88,18 @@ def sanitize_mermaid_diagram(raw: Optional[str]) -> Optional[str]:
     diagram_lines = lines[start_idx:]
     repaired: list[str] = []
 
-    arrow_sub = re.compile(r"[\u2192\u27F6\u2794\u279C]")
-    double_arrow_sub = re.compile(r"[\u21D2\u27F9]")
-    left_arrow_sub = re.compile(r"[\u2190\u27F5]")
+    dash_arrow_sub = re.compile(r"[─—–―\-]+>")
+    arrow_sub = re.compile(r"[\u2192\u27F6\u2794\u279C\u21E2\u21A0\u279F\u27A1]")
+    double_arrow_sub = re.compile(r"[═=]+>|[\u21D2\u27F9\u21D0\u21D4]")
+    left_arrow_sub = re.compile(r"<[─—–―\-]+|[\u2190\u27F5]")
     single_arrow_sub = re.compile(r"(?<!-)->(?!>)")
     bracket_pattern = re.compile(r"(\b[A-Za-z0-9_-]+)\[([^\"\n\]]+)\]")
     edge_pipe_pattern = re.compile(r"(-->|==>|<--)\|([^\"|\n]+)\|")
 
     for line in diagram_lines:
-        # Standardize arrows
-        l = arrow_sub.sub("-->", line)
+        # Standardize arrows including box-drawing, unicode arrows, and dashes
+        l = dash_arrow_sub.sub("-->", line)
+        l = arrow_sub.sub("-->", l)
         l = double_arrow_sub.sub("==>", l)
         l = left_arrow_sub.sub("<--", l)
         l = single_arrow_sub.sub("-->", l)

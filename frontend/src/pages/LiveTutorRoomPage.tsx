@@ -314,35 +314,35 @@ const LiveRoomInner: React.FC = () => {
 
   if (loadingPage) {
     return (
-      <div className="min-h-screen bg-navy-950 flex items-center justify-center text-slate-300">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin text-accent-blue" />
-        Opening tutoring room...
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center text-slate-700">
+        <Loader2 className="mr-2 h-6 w-6 animate-spin text-blue-600" />
+        <span className="font-semibold text-sm">Opening tutoring studio...</span>
       </div>
     );
   }
 
   if (!session || !user) {
     return (
-      <div className="min-h-screen bg-navy-950 p-8 text-center text-slate-300">
+      <div className="min-h-screen bg-[#FAF9F6] p-8 text-center text-slate-700">
         {roomError || "Session not found."}
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-navy-950 text-slate-100">
+    <div className="flex min-h-screen flex-col bg-[#FAF9F6] text-[#0F172A] [background-image:radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:28px_28px]">
       <Navbar />
 
-      <main className="mx-auto flex w-full max-w-[1680px] flex-1 flex-col gap-4 px-4 py-3 sm:px-6">
+      <main className="mx-auto flex w-full max-w-[1680px] flex-1 flex-col gap-4 px-4 py-4 sm:px-6">
         {roomError && (
-          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-xs text-rose-200">
+          <div className="rounded-2xl border border-rose-300 bg-rose-50 px-4 py-2.5 text-xs text-rose-900 shadow-sm">
             {roomError}
           </div>
         )}
 
-        <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-12">
-          {/* LEFT / CENTER: Video + Whiteboard / Video Explainer / Intel (Expanded for maximum learning view) */}
-          <div className="flex flex-col gap-3.5 lg:col-span-8 xl:col-span-8">
+        <div className="grid flex-1 grid-cols-1 gap-5 lg:grid-cols-12">
+          {/* LEFT / CENTER: Video + Whiteboard / Video Explainer / Intel */}
+          <div className="flex flex-col gap-4 lg:col-span-8 xl:col-span-8">
             <VideoRoom
               sessionId={session.id}
               sessionTopic={session.zoom_session_name}
@@ -363,7 +363,7 @@ const LiveRoomInner: React.FC = () => {
           </div>
 
           {/* RIGHT: AI Tutor Conversation */}
-          <div className="min-h-[500px] lg:col-span-4 xl:col-span-4 lg:h-[calc(100vh-8.5rem)]">
+          <div className="min-h-[520px] lg:col-span-4 xl:col-span-4 lg:h-[calc(100vh-8.5rem)]">
             <TutorChatPanel
               messages={messages}
               tutorMode={tutorMode}
@@ -379,13 +379,13 @@ const LiveRoomInner: React.FC = () => {
       </main>
 
       {/* Bottom Status Bar */}
-      <footer className="border-t border-slate-800/80 bg-navy-900/90 px-4 py-2.5 text-xs text-slate-300 sm:px-6">
+      <footer className="border-t border-slate-200/90 bg-white/90 backdrop-blur-md px-4 py-2.5 text-xs text-slate-700 sm:px-6 shadow-sm">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-4">
-            <span className="inline-flex items-center gap-1.5">
-              <Mic className="h-3.5 w-3.5 text-accent-teal" />
+            <span className="inline-flex items-center gap-1.5 font-medium">
+              <Mic className="h-3.5 w-3.5 text-teal-600" />
               Audio Mode:{" "}
-              <strong className="text-teal-300">
+              <strong className="text-teal-800">
                 {audio.mode === "push_to_talk"
                   ? "Push-to-Talk (Zoom Mic Isolated)"
                   : audio.mode === "zoom_plus_speech"
@@ -393,24 +393,24 @@ const LiveRoomInner: React.FC = () => {
                   : "Text Only"}
               </strong>
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Radio className="h-3.5 w-3.5 text-accent-blue" />
-              Mic Owner: <span className="font-mono text-slate-200">{audio.activeOwner}</span>
+            <span className="inline-flex items-center gap-1.5 font-medium">
+              <Radio className="h-3.5 w-3.5 text-blue-600" />
+              Mic Owner: <span className="font-mono text-slate-900 font-bold">{audio.activeOwner}</span>
             </span>
-            <span className="text-slate-400">
-              Zoom: <strong className="text-slate-200">{zoom.connectionState}</strong>
+            <span className="text-slate-500 font-medium">
+              Zoom: <strong className="text-slate-800 font-semibold">{zoom.connectionState}</strong>
             </span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-1 font-mono text-slate-300">
-              <Clock className="h-3.5 w-3.5 text-slate-400" />
+            <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-slate-800">
+              <Clock className="h-3.5 w-3.5 text-slate-500" />
               {formatDuration(elapsedSeconds)}
             </span>
             <button
               type="button"
               onClick={() => void handleEndSession()}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600/90 px-3 py-1 text-xs font-medium text-white hover:bg-rose-500"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition"
             >
               <PhoneOff className="h-3.5 w-3.5" />
               Leave Session

@@ -94,19 +94,19 @@ export const SessionSetupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-navy-950 text-slate-100">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#0F172A] [background-image:radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:28px_28px]">
       <Navbar />
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <div className="mb-6">
-          <div className="inline-flex items-center gap-1.5 text-xs font-medium text-accent-teal">
-            <Sparkles className="h-3.5 w-3.5" />
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-teal-800">
+            <Sparkles className="h-3.5 w-3.5 text-teal-600" />
             Session Configuration
           </div>
-          <h1 className="mt-1 text-2xl font-bold text-white">
+          <h1 className="mt-2 font-display text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
             Personalize Your Tutoring Room
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-600">
             These settings calibrate the AI tutor&apos;s depth, teaching method, and study material
             grounding.
           </p>
@@ -114,19 +114,19 @@ export const SessionSetupPage: React.FC = () => {
 
         <form
           onSubmit={handleCreateSession}
-          className="space-y-6 rounded-2xl border border-slate-800 bg-navy-900/70 p-6"
+          className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm relative overflow-hidden"
         >
           {/* Open-Material Coverage Banner */}
-          <div className="flex items-start gap-2.5 rounded-xl border border-teal-500/25 bg-teal-950/20 px-4 py-3">
-            <Sparkles className="h-4 w-4 text-teal-400 shrink-0 mt-0.5" />
-            <div className="text-xs text-slate-300 leading-relaxed">
-              <strong className="text-teal-300">Open-Topic Tutoring:</strong> You don&apos;t have to lock yourself into a single topic. When you upload or select study notes, LearnMate indexes your entire document so you can ask about <em>any concept, formula, or chapter</em> in your notes at any time.
+          <div className="flex items-start gap-3 rounded-2xl border border-teal-200 bg-teal-50/80 p-4">
+            <Sparkles className="h-4 w-4 text-teal-700 shrink-0 mt-0.5" />
+            <div className="text-xs text-slate-700 leading-relaxed">
+              <strong className="text-teal-900 font-bold">Open-Topic Tutoring:</strong> You don&apos;t have to lock yourself into a single topic. When you upload or select study notes, LearnMate indexes your entire document so you can ask about <span className="font-semibold text-slate-900">any concept, formula, or chapter</span> in your notes at any time.
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-300">
+              <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Subject / Course
               </label>
               <input
@@ -134,32 +134,32 @@ export const SessionSetupPage: React.FC = () => {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g., Biology, Calculus, Operating Systems"
-                className="w-full rounded-xl border border-slate-700/80 bg-navy-950 px-3.5 py-2.5 text-sm text-white focus:border-accent-blue focus:outline-none"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition font-medium"
               />
             </div>
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label className="text-xs font-medium text-slate-300">
-                  Focus Topic <span className="font-normal text-slate-500">(Optional)</span>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Focus Topic <span className="font-normal text-slate-400 lowercase">(optional)</span>
                 </label>
-                <span className="text-[10px] font-medium text-teal-400">
-                  Covers all concepts if blank
+                <span className="font-mono text-[10px] font-bold text-teal-700">
+                  Covers all notes if blank
                 </span>
               </div>
               <input
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder="Leave blank to cover all topics in your notes"
-                className="w-full rounded-xl border border-slate-700/80 bg-navy-950 px-3.5 py-2.5 text-sm text-white focus:border-accent-blue focus:outline-none"
+                placeholder="Leave blank to cover all topics in notes"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition font-medium"
               />
             </div>
           </div>
 
           {/* Learning Level */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-300">
+            <label className="mb-2 block text-xs font-bold text-slate-700 uppercase tracking-wider">
               Learning Level
             </label>
             <div className="grid grid-cols-3 gap-2.5">
@@ -168,10 +168,10 @@ export const SessionSetupPage: React.FC = () => {
                   key={lvl}
                   type="button"
                   onClick={() => setLearningLevel(lvl)}
-                  className={`rounded-xl border px-3 py-2.5 text-xs font-semibold capitalize transition ${
+                  className={`rounded-xl px-3 py-2.5 text-xs font-bold capitalize transition ${
                     learningLevel === lvl
-                      ? "border-accent-blue bg-accent-blue/15 text-blue-200"
-                      : "border-slate-800 bg-navy-950 text-slate-400 hover:border-slate-700"
+                      ? "border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm"
+                      : "border border-slate-200 bg-slate-50/70 text-slate-600 hover:bg-white hover:border-slate-300"
                   }`}
                 >
                   {lvl}
@@ -182,7 +182,7 @@ export const SessionSetupPage: React.FC = () => {
 
           {/* Teaching Style */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-300">
+            <label className="mb-2 block text-xs font-bold text-slate-700 uppercase tracking-wider">
               Teaching Style
             </label>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -226,14 +226,14 @@ export const SessionSetupPage: React.FC = () => {
                     setTeachingStyle(st.id);
                     setTutorMode(st.mode);
                   }}
-                  className={`rounded-xl border p-3 text-left transition ${
+                  className={`rounded-2xl p-3.5 text-left transition ${
                     teachingStyle === st.id
-                      ? "border-accent-teal bg-accent-teal/10 text-teal-100"
-                      : "border-slate-800 bg-navy-950 text-slate-300 hover:border-slate-700"
+                      ? "border-2 border-teal-600 bg-teal-50/80 text-teal-950 shadow-sm"
+                      : "border border-slate-200 bg-slate-50/60 text-slate-700 hover:bg-white hover:border-slate-300"
                   }`}
                 >
-                  <div className="text-xs font-semibold">{st.title}</div>
-                  <div className="mt-0.5 text-[11px] text-slate-400">{st.desc}</div>
+                  <div className="text-xs font-bold text-slate-900">{st.title}</div>
+                  <div className="mt-1 text-[11px] text-slate-500 leading-normal">{st.desc}</div>
                 </button>
               ))}
             </div>
@@ -241,8 +241,8 @@ export const SessionSetupPage: React.FC = () => {
 
           {/* Duration */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
-              Planned Duration (optional, minutes)
+            <label className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Planned Duration (minutes)
             </label>
             <input
               type="number"
@@ -250,26 +250,26 @@ export const SessionSetupPage: React.FC = () => {
               max={180}
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value) || 30)}
-              className="w-36 rounded-xl border border-slate-700/80 bg-navy-950 px-3.5 py-2 text-sm text-white focus:border-accent-blue focus:outline-none"
+              className="w-36 rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition font-semibold"
             />
           </div>
 
           {/* Study Material PDF Upload & Selection */}
-          <div className="rounded-xl border border-slate-800 bg-navy-950/80 p-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div className="text-xs font-semibold text-slate-200">
+                <div className="text-xs font-bold text-slate-900">
                   Study Material (PDF Grounding)
                 </div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-[11px] text-slate-500">
                   Select existing PDFs or upload new notes for citation-backed tutoring.
                 </div>
               </div>
-              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700 bg-navy-900 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-accent-teal">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">
                 {uploading ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-accent-teal" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-teal-600" />
                 ) : (
-                  <Upload className="h-3.5 w-3.5 text-accent-teal" />
+                  <Upload className="h-3.5 w-3.5 text-teal-600" />
                 )}
                 {uploading ? "Extracting..." : "Upload PDF"}
                 <input
@@ -283,7 +283,7 @@ export const SessionSetupPage: React.FC = () => {
             </div>
 
             {documents.length === 0 ? (
-              <p className="text-xs text-slate-500">No PDFs uploaded yet (optional).</p>
+              <p className="text-xs text-slate-400">No PDFs uploaded yet (optional).</p>
             ) : (
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {documents.map((doc) => {
@@ -294,17 +294,17 @@ export const SessionSetupPage: React.FC = () => {
                       type="button"
                       disabled={doc.processing_status !== "ready"}
                       onClick={() => toggleDoc(doc.id)}
-                      className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left text-xs transition ${
+                      className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs transition ${
                         active
-                          ? "border-accent-blue bg-accent-blue/15 text-blue-100"
-                          : "border-slate-800 bg-navy-900 text-slate-300"
+                          ? "border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold shadow-sm"
+                          : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 font-medium"
                       } disabled:opacity-50`}
                     >
                       <div className="flex min-w-0 items-center gap-2">
-                        <FileText className="h-3.5 w-3.5 shrink-0 text-accent-teal" />
+                        <FileText className="h-3.5 w-3.5 shrink-0 text-blue-600" />
                         <span className="truncate">{doc.file_name}</span>
                       </div>
-                      {active && <Check className="h-3.5 w-3.5 shrink-0 text-accent-blue" />}
+                      {active && <Check className="h-4 w-4 shrink-0 text-blue-600" />}
                     </button>
                   );
                 })}
@@ -313,7 +313,7 @@ export const SessionSetupPage: React.FC = () => {
           </div>
 
           {error && (
-            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-200">
+            <div className="rounded-xl border border-rose-300 bg-rose-50 p-3 text-xs text-rose-900">
               {error}
             </div>
           )}
@@ -321,7 +321,7 @@ export const SessionSetupPage: React.FC = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-violet px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:opacity-95 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition disabled:opacity-50"
           >
             {submitting ? (
               <>

@@ -11,21 +11,21 @@ export const ParticipantBadgeList: React.FC<{ participants: ZoomParticipant[] }>
       {participants.map((p) => (
         <div
           key={p.userId}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-700/60 bg-navy-900/90 px-2.5 py-1 text-xs text-slate-200"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm"
         >
-          <span className="font-medium">
+          <span>
             {p.displayName} {p.isSelf ? "(You)" : ""}
           </span>
-          {p.isHost && <Shield className="h-3 w-3 text-accent-teal" />}
+          {p.isHost && <Shield className="h-3 w-3 text-teal-600" />}
           {p.videoOn ? (
-            <Video className="h-3 w-3 text-accent-blue" />
+            <Video className="h-3 w-3 text-blue-600" />
           ) : (
-            <VideoOff className="h-3 w-3 text-slate-500" />
+            <VideoOff className="h-3 w-3 text-slate-400" />
           )}
           {p.audioOn && !p.muted ? (
-            <Mic className="h-3 w-3 text-emerald-400" />
+            <Mic className="h-3 w-3 text-emerald-600" />
           ) : (
-            <MicOff className="h-3 w-3 text-slate-500" />
+            <MicOff className="h-3 w-3 text-slate-400" />
           )}
         </div>
       ))}

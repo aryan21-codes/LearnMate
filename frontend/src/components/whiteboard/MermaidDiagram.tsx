@@ -65,10 +65,12 @@ function cleanAndRepairMermaid(raw: string): string {
 
   return diagramLines
     .map((line) => {
-      // 1. Replace unicode arrows with ASCII arrows, and normalize single -> to -->
+      // 1. Replace unicode arrows and box drawing chars with ASCII arrows, and normalize single -> to -->
       let l = line
-        .replace(/[\u2192\u27F6\u2794\u279C]/g, "-->")
-        .replace(/[\u21D2\u27F9]/g, "==>")
+        .replace(/[─—–―\-]+>/g, "-->")
+        .replace(/<[─—–―\-]+/g, "<--")
+        .replace(/[\u2192\u27F6\u2794\u279C\u21E2\u21A0\u279F\u27A1]/g, "-->")
+        .replace(/[═=]+>|[\u21D2\u27F9]/g, "==>")
         .replace(/[\u2190\u27F5]/g, "<--")
         .replace(/(?<!-)->(?!>)/g, "-->");
 

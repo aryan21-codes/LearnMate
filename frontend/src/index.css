@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    background-color: #070b14;
-    color: #f1f5f9;
+    background-color: #FAF9F6;
+    color: #0F172A;
     font-family: "Inter", system-ui, -apple-system, sans-serif;
   }
 }
@@ -41,9 +41,9 @@ video-player {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.35);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(100, 116, 139, 0.5);
 }
