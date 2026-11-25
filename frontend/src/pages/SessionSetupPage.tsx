@@ -16,8 +16,8 @@ export const SessionSetupPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [subject, setSubject] = useState("Computer Science");
-  const [topic, setTopic] = useState(searchParams.get("topic") || "Recursion & Call Stack");
+  const [subject, setSubject] = useState(searchParams.get("subject") || "General Studies");
+  const [topic, setTopic] = useState(searchParams.get("topic") || "");
   const [learningLevel, setLearningLevel] = useState<LearningLevel>("beginner");
   const [teachingStyle, setTeachingStyle] = useState<TeachingStyle>("simple");
   const [tutorMode, setTutorMode] = useState<TutorMode>("explain");
@@ -50,6 +50,10 @@ export const SessionSetupPage: React.FC = () => {
       setDocuments((prev) => [created, ...prev]);
       if (created.processing_status === "ready") {
         setSelectedDocs((prev) => [...prev, created.id]);
+      }
+      if (!subject || subject === "General Studies") {
+        const cleanName = file.name.replace(/\.[a-zA-Z0-9]+$/, "").replace(/[_-]/g, " ");
+        setSubject(cleanName);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload PDF.");
@@ -112,29 +116,42 @@ export const SessionSetupPage: React.FC = () => {
           onSubmit={handleCreateSession}
           className="space-y-6 rounded-2xl border border-slate-800 bg-navy-900/70 p-6"
         >
+          {/* Open-Material Coverage Banner */}
+          <div className="flex items-start gap-2.5 rounded-xl border border-teal-500/25 bg-teal-950/20 px-4 py-3">
+            <Sparkles className="h-4 w-4 text-teal-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-slate-300 leading-relaxed">
+              <strong className="text-teal-300">Open-Topic Tutoring:</strong> You don&apos;t have to lock yourself into a single topic. When you upload or select study notes, LearnMate indexes your entire document so you can ask about <em>any concept, formula, or chapter</em> in your notes at any time.
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-300">Subject</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-300">
+                Subject / Course
+              </label>
               <input
                 type="text"
-                required
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="e.g., Biology, Calculus, Data Structures"
+                placeholder="e.g., Biology, Calculus, Operating Systems"
                 className="w-full rounded-xl border border-slate-700/80 bg-navy-950 px-3.5 py-2.5 text-sm text-white focus:border-accent-blue focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-300">
-                Specific Topic
-              </label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="text-xs font-medium text-slate-300">
+                  Focus Topic <span className="font-normal text-slate-500">(Optional)</span>
+                </label>
+                <span className="text-[10px] font-medium text-teal-400">
+                  Covers all concepts if blank
+                </span>
+              </div>
               <input
                 type="text"
-                required
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder="e.g., Cellular Respiration, Recursion"
+                placeholder="Leave blank to cover all topics in your notes"
                 className="w-full rounded-xl border border-slate-700/80 bg-navy-950 px-3.5 py-2.5 text-sm text-white focus:border-accent-blue focus:outline-none"
               />
             </div>

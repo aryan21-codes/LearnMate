@@ -23,8 +23,8 @@ class UserResponse(BaseModel):
 
 class SessionCreateRequest(BaseModel):
     user_id: str = Field(..., min_length=1)
-    subject: str = Field(..., min_length=1, max_length=120)
-    topic: str = Field(..., min_length=1, max_length=200)
+    subject: Optional[str] = Field(default="General Studies", max_length=120)
+    topic: Optional[str] = Field(default=None, max_length=200)
     learning_level: LearningLevel = "intermediate"
     tutor_mode: TutorMode = "explain"
     teaching_style: TeachingStyle = "simple"

@@ -69,6 +69,20 @@ def test_session_lifecycle_and_progress():
     assert sess["subject"] == "Computer Science"
     assert sess["zoom_session_name"].startswith("lm-")
 
+    # Verify session creation with NO topic provided (auto-infers comprehensive review)
+    no_topic_res = client.post(
+        "/api/session/create",
+        json={
+            "user_id": "test-user-1",
+            "subject": "Biology",
+            "document_ids": [],
+        },
+    )
+    assert no_topic_res.status_code == 200
+    no_topic_sess = no_topic_res.json()
+    assert no_topic_sess["subject"] == "Biology"
+    assert "Biology" in no_topic_sess["topic"]
+
     get_res = client.get(f"/api/session/{sess['id']}")
     assert get_res.status_code == 200
 

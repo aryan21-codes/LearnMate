@@ -187,9 +187,10 @@ def build_dynamic_system_prompt(
 --- CURRENT SESSION CONTEXT ---
 - Student learning level: {session['learning_level']}
 - Subject: {session['subject']}
-- Current topic: {session['topic']}
+- Session Scope: {session['topic']}
 - Teaching style preference: {session.get('teaching_style', 'simple')}
 - Current tutor mode: {tutor_mode} -> {MODE_GUIDANCE.get(tutor_mode, MODE_GUIDANCE['explain'])}{strategy_line}
+- Comprehensive Document Coverage: You are tutoring across all concepts, topics, theorems, and definitions in the student's study material. The student is free to ask questions about ANY topic in their notes. Dynamically identify which specific concept their question addresses, cite relevant sections of their notes, and explain step by step.
 
 Known weak concepts:
 {weak_block}

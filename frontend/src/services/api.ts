@@ -64,8 +64,8 @@ export const api = {
 
   createSession: (payload: {
     user_id: string;
-    subject: string;
-    topic: string;
+    subject?: string;
+    topic?: string;
     learning_level: LearningLevel;
     tutor_mode: TutorMode;
     teaching_style: TeachingStyle;

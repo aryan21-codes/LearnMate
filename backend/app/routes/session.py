@@ -1,3 +1,4 @@
+import re
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.models import (
@@ -14,10 +15,27 @@ router = APIRouter(prefix="/api/session", tags=["sessions"])
 
 @router.post("/create", response_model=SessionResponse)
 def create_session(payload: SessionCreateRequest):
+    subject = payload.subject.strip() if payload.subject and payload.subject.strip() else "General Studies"
+    topic = payload.topic.strip() if payload.topic and payload.topic.strip() else None
+
+    # If topic is not provided, analyze attached documents or set comprehensive study scope
+    if not topic:
+        if payload.document_ids:
+            doc_titles: list[str] = []
+            for doc_id in payload.document_ids:
+                doc = db.get_document(doc_id)
+                if doc and doc.get("file_name"):
+                    clean_name = re.sub(r"\.[a-zA-Z0-9]+$", "", doc["file_name"]).replace("_", " ").replace("-", " ")
+                    doc_titles.append(clean_name.strip())
+            if doc_titles:
+                topic = f"All Topics in {', '.join(doc_titles[:2])}"
+        if not topic:
+            topic = f"Comprehensive {subject} Review"
+
     session = db.create_session(
         user_id=payload.user_id,
-        subject=payload.subject.strip(),
-        topic=payload.topic.strip(),
+        subject=subject,
+        topic=topic,
         learning_level=payload.learning_level,
         tutor_mode=payload.tutor_mode,
         teaching_style=payload.teaching_style,
