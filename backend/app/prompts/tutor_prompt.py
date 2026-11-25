@@ -48,14 +48,17 @@ _ALLOWED_MERMAID_PREFIXES = (
     "classDiagram",
     "erDiagram",
     "mindmap",
+    "timeline",
 )
 
 
 def sanitize_mermaid_diagram(raw: Optional[str]) -> Optional[str]:
-    """Validate and sanitize LLM-generated Mermaid syntax.
+    """Validate, clean, and auto-repair LLM-generated Mermaid syntax.
 
-    Blocks embedded HTML/script tags and ensures a supported Mermaid header.
-    Returns None if invalid so the UI falls back cleanly to text explanation.
+    1. Strips markdown fences and any conversational preamble before the diagram header.
+    2. Converts unicode arrow variants (⟶, →, ⟹) to standard ASCII arrows (-->).
+    3. Quotes unquoted node labels containing parentheses, equals, or colons to prevent syntax errors.
+    4. Blocks embedded HTML/script tags.
     """
     if not raw:
         return None
@@ -71,11 +74,66 @@ def sanitize_mermaid_diagram(raw: Optional[str]) -> Optional[str]:
     if "<script" in lowered or "javascript:" in lowered or "onerror=" in lowered or "onload=" in lowered:
         return None
 
-    first_line = cleaned.splitlines()[0].strip()
-    if not any(first_line.startswith(prefix) for prefix in _ALLOWED_MERMAID_PREFIXES):
+    lines = cleaned.splitlines()
+    start_idx: Optional[int] = None
+    for i, line in enumerate(lines):
+        trimmed = line.strip()
+        if any(trimmed.startswith(prefix) for prefix in _ALLOWED_MERMAID_PREFIXES):
+            start_idx = i
+            break
+
+    if start_idx is None:
         return None
 
-    return cleaned
+    diagram_lines = lines[start_idx:]
+    repaired: list[str] = []
+
+    arrow_sub = re.compile(r"[\u2192\u27F6\u2794\u279C]")
+    double_arrow_sub = re.compile(r"[\u21D2\u27F9]")
+    left_arrow_sub = re.compile(r"[\u2190\u27F5]")
+    single_arrow_sub = re.compile(r"(?<!-)->(?!>)")
+    bracket_pattern = re.compile(r"(\b[A-Za-z0-9_-]+)\[([^\"\n\]]+)\]")
+    edge_pipe_pattern = re.compile(r"(-->|==>|<--)\|([^\"|\n]+)\|")
+
+    for line in diagram_lines:
+        # Standardize arrows
+        l = arrow_sub.sub("-->", line)
+        l = double_arrow_sub.sub("==>", l)
+        l = left_arrow_sub.sub("<--", l)
+        l = single_arrow_sub.sub("-->", l)
+
+        # Auto-quote labels containing characters that break Mermaid parser
+        def _quote_bracket(match: re.Match) -> str:
+            node_id = match.group(1)
+            content = match.group(2).strip()
+            if (content.startswith('"') and content.endswith('"')) or (
+                content.startswith("'") and content.endswith("'")
+            ):
+                return f"{node_id}[{content}]"
+            if not re.match(r"^[A-Za-z0-9_ ]+$", content):
+                escaped = content.replace('"', "'")
+                return f'{node_id}["{escaped}"]'
+            return f"{node_id}[{content}]"
+
+        # Auto-quote edge labels in |label|
+        def _quote_pipe(match: re.Match) -> str:
+            arrow = match.group(1)
+            edge_text = match.group(2).strip()
+            if (edge_text.startswith('"') and edge_text.endswith('"')) or (
+                edge_text.startswith("'") and edge_text.endswith("'")
+            ):
+                return f"{arrow}|{edge_text}|"
+            if not re.match(r"^[A-Za-z0-9_ ]+$", edge_text):
+                escaped = edge_text.replace('"', "'")
+                return f'{arrow}|"{escaped}"|'
+            return f"{arrow}|{edge_text}|"
+
+        l = bracket_pattern.sub(_quote_bracket, l)
+        l = edge_pipe_pattern.sub(_quote_pipe, l)
+        repaired.append(l)
+
+    result = "\n".join(repaired).strip()
+    return result if result else None
 
 
 def choose_alternative_strategy(previous_strategy: Optional[str]) -> str:

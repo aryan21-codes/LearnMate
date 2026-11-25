@@ -9,6 +9,8 @@ from app.schemas.models import (
     TutorQuizRequest,
     TutorQuizResponse,
     TutorStructuredResponse,
+    VideoWalkthroughRequest,
+    VideoWalkthroughResponse,
 )
 from app.services.database import db
 from app.services.document_service import retrieve_relevant_chunks
@@ -17,6 +19,7 @@ from app.services.llm_service import (
     evaluate_student_response,
     generate_quiz_question,
     generate_tutor_answer,
+    generate_video_walkthrough,
     transcribe_audio_bytes,
 )
 
@@ -279,6 +282,50 @@ def evaluate_answer(payload: TutorEvaluateRequest):
         updated_mastery_estimate=float(mastery_row["mastery_score"]),
         citations=citations,
         timestamp=tutor_msg["timestamp"],
+    )
+
+
+@router.post("/api/tutor/video-walkthrough", response_model=VideoWalkthroughResponse)
+def create_video_walkthrough(payload: VideoWalkthroughRequest):
+    session = db.get_session(payload.session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    target_topic = payload.topic or session["topic"]
+    doc_ids = session.get("document_ids", [])
+    retrieved = retrieve_relevant_chunks(
+        query=f"{target_topic} {payload.concept or ''}",
+        document_ids=doc_ids,
+        user_id=session["user_id"] if not doc_ids else None,
+        top_k=3,
+    )
+
+    try:
+        walkthrough = generate_video_walkthrough(
+            session=session,
+            topic=target_topic,
+            concept=payload.concept,
+            target_duration_seconds=payload.target_duration_seconds or 45,
+            retrieved_chunks=retrieved,
+        )
+    except LLMConfigError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Video walkthrough generation failed: {exc}")
+
+    db.add_message(
+        session_id=session["id"],
+        role="tutor",
+        content=f"🎬 Animated Video Walkthrough generated: {walkthrough.get('title')}",
+        metadata={"kind": "video_walkthrough", "video_data": walkthrough},
+    )
+
+    return VideoWalkthroughResponse(
+        title=walkthrough.get("title") or f"Visual Walkthrough: {target_topic}",
+        topic=target_topic,
+        total_duration_seconds=walkthrough.get("total_duration_seconds", 45),
+        summary=walkthrough.get("summary") or "Animated visual explainer.",
+        scenes=walkthrough.get("scenes", []),
     )
 
 

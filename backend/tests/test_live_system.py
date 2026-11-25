@@ -159,10 +159,30 @@ def test_06_adaptive_evaluation_and_strategy_switch():
 
 
 def test_07_audio_transcription_endpoint():
-    """Test audio capture fallback transcription endpoint."""
-    with httpx.Client(base_url=BACKEND_BASE, timeout=10.0) as client:
-        mock_audio = b"RIFF....WAVEfmt ...."
-        files = {"file": ("student_speech.webm", mock_audio, "audio/webm")}
+    """Test audio capture fallback transcription endpoint with a valid WAV container."""
+    import struct
+    sample_rate = 8000
+    data_size = 16000
+    header = struct.pack(
+        "<4sI4s4sIHHIIHH4sI",
+        b"RIFF",
+        36 + data_size,
+        b"WAVE",
+        b"fmt ",
+        16,
+        1,
+        1,
+        sample_rate,
+        sample_rate * 2,
+        2,
+        16,
+        b"data",
+        data_size,
+    )
+    wav_bytes = header + bytes(data_size)
+
+    with httpx.Client(base_url=BACKEND_BASE, timeout=15.0) as client:
+        files = {"file": ("student_speech.wav", wav_bytes, "audio/wav")}
         resp = client.post("/api/audio/transcribe", files=files)
         assert resp.status_code == 200, f"Audio transcribe failed: {resp.text}"
         assert "transcript" in resp.json()
@@ -212,3 +232,28 @@ def test_10_frontend_web_server():
         assert 'src="/src/main.tsx"' in html or 'type="module"' in html
         assert "LearnMate Live" in html
         print("[OK] Frontend UI active at http://localhost:5173/ and successfully serving index.html")
+
+
+def test_11_video_walkthrough_generation():
+    """Test AI video walkthrough generation and scene structuring."""
+    with httpx.Client(base_url=BACKEND_BASE, timeout=30.0) as client:
+        sessions = client.get("/api/session/user/student-e2e-1").json()
+        assert len(sessions) > 0
+        session_id = sessions[0]["id"]
+
+        resp = client.post(
+            "/api/tutor/video-walkthrough",
+            json={
+                "session_id": session_id,
+                "topic": "Recursion & Call Stack",
+                "concept": "Stack frames for fact(4)",
+                "target_duration_seconds": 40,
+            },
+        )
+        assert resp.status_code == 200, f"Video walkthrough failed: {resp.text}"
+        data = resp.json()
+        assert "title" in data
+        assert len(data["scenes"]) >= 3
+        assert data["scenes"][0]["narration"]
+        print(f"[OK] Video Walkthrough generated: '{data['title']}' ({len(data['scenes'])} scenes)")
+

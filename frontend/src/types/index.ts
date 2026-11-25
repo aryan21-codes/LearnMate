@@ -124,3 +124,21 @@ export interface SessionSummary {
   suggested_next_session: string;
   created_at: string;
 }
+
+export interface VideoScene {
+  scene_number: number;
+  title: string;
+  narration: string;
+  diagram_mermaid?: string | null;
+  key_points: string[];
+  visual_focus?: string | null;
+  duration_seconds: number;
+}
+
+export interface VideoWalkthroughResponse {
+  title: string;
+  topic: string;
+  total_duration_seconds: number;
+  summary: string;
+  scenes: VideoScene[];
+}

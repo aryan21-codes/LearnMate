@@ -175,3 +175,29 @@ class SessionInsightResponse(BaseModel):
     recommendations: list[str] = Field(default_factory=list)
     suggested_next_session: str
     created_at: str
+
+
+class VideoScene(BaseModel):
+    scene_number: int
+    title: str
+    narration: str
+    diagram_mermaid: Optional[str] = None
+    key_points: list[str] = Field(default_factory=list)
+    visual_focus: Optional[str] = None
+    duration_seconds: int = 8
+
+
+class VideoWalkthroughRequest(BaseModel):
+    session_id: str
+    topic: Optional[str] = None
+    concept: Optional[str] = None
+    target_duration_seconds: Optional[int] = 45
+
+
+class VideoWalkthroughResponse(BaseModel):
+    title: str
+    topic: str
+    total_duration_seconds: int
+    summary: str
+    scenes: list[VideoScene]
+

@@ -333,7 +333,7 @@ const LiveRoomInner: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-navy-950 text-slate-100">
       <Navbar />
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 px-4 py-4 sm:px-6">
+      <main className="mx-auto flex w-full max-w-[1680px] flex-1 flex-col gap-4 px-4 py-3 sm:px-6">
         {roomError && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-xs text-rose-200">
             {roomError}
@@ -341,8 +341,8 @@ const LiveRoomInner: React.FC = () => {
         )}
 
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-12">
-          {/* LEFT / CENTER: Video + Secondary Whiteboard/Refs/Intel */}
-          <div className="flex flex-col gap-4 lg:col-span-7">
+          {/* LEFT / CENTER: Video + Whiteboard / Video Explainer / Intel (Expanded for maximum learning view) */}
+          <div className="flex flex-col gap-3.5 lg:col-span-8 xl:col-span-8">
             <VideoRoom
               sessionId={session.id}
               sessionTopic={session.zoom_session_name}
@@ -353,6 +353,7 @@ const LiveRoomInner: React.FC = () => {
             />
 
             <LearningIntelPanel
+              sessionId={session.id}
               currentTopic={session.topic}
               latestDiagram={latestDiagram}
               latestCitations={latestCitations}
@@ -362,7 +363,7 @@ const LiveRoomInner: React.FC = () => {
           </div>
 
           {/* RIGHT: AI Tutor Conversation */}
-          <div className="min-h-[540px] lg:col-span-5 lg:h-[calc(100vh-11rem)]">
+          <div className="min-h-[500px] lg:col-span-4 xl:col-span-4 lg:h-[calc(100vh-8.5rem)]">
             <TutorChatPanel
               messages={messages}
               tutorMode={tutorMode}

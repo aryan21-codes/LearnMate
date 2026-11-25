@@ -50,6 +50,53 @@ def _mock_intelligent_response(system_prompt: str, user_prompt: str) -> dict[str
     """Generates high-fidelity structured fallback responses when OpenAI API key is not configured."""
     lower_prompt = user_prompt.lower()
     
+    # Check if this is a video walkthrough request
+    if "animated whiteboard explainer video script" in lower_prompt or "video walkthrough" in lower_prompt:
+        return {
+            "title": "Visual Walkthrough: Recursion & Call Stack Allocation",
+            "topic": "Recursion & Call Stack",
+            "total_duration_seconds": 40,
+            "summary": "A step-by-step visual exploration of how function calls allocate stack memory and unwind cleanly.",
+            "scenes": [
+                {
+                    "scene_number": 1,
+                    "title": "1. The Initial Call",
+                    "narration": "When a recursive function like factorial(4) is invoked, the program allocates a dedicated stack frame in memory storing local variable n=4.",
+                    "diagram_mermaid": "flowchart TD\n    A[\"Call: fact(4), n=4\"]",
+                    "key_points": ["First frame placed on call stack", "Holds local variable n=4"],
+                    "visual_focus": "Root stack frame allocation",
+                    "duration_seconds": 10,
+                },
+                {
+                    "scene_number": 2,
+                    "title": "2. Stacking Subproblems",
+                    "narration": "Because 4 > 1, the function cannot compute the answer yet. It calls factorial(3), pushing a new frame right on top of the call stack.",
+                    "diagram_mermaid": "flowchart TD\n    B[\"Active: fact(3), n=3\"] --> A[\"Waiting: fact(4), n=4\"]",
+                    "key_points": ["New frame placed on top", "Previous frame pauses execution"],
+                    "visual_focus": "Stack growth upwards",
+                    "duration_seconds": 10,
+                },
+                {
+                    "scene_number": 3,
+                    "title": "3. The Base Case Trigger",
+                    "narration": "Calls continue stacking until factorial(1) is reached. This is our base case! It terminates without making another call and returns 1 immediately.",
+                    "diagram_mermaid": "flowchart TD\n    C[\"Base Case: fact(1) = 1\"] --> B[\"Waiting: fact(2)\"]\n    B --> A[\"Waiting: fact(3)\"]",
+                    "key_points": ["Base case reached", "Zero further recursive calls"],
+                    "visual_focus": "Base condition termination",
+                    "duration_seconds": 10,
+                },
+                {
+                    "scene_number": 4,
+                    "title": "4. Stack Unwinding & Final Answer",
+                    "narration": "Now each frame completes in reverse order, multiplying its result and popping off the stack until returning the final answer 24.",
+                    "diagram_mermaid": "flowchart TD\n    C[\"Return 1\"] -->|1 * 2| B[\"Return 2\"]\n    B -->|2 * 3| A[\"Return 6\"]\n    A -->|6 * 4| Final[\"Final Result: 24\"]\n    style Final fill:#10b981,stroke:#059669",
+                    "key_points": ["Frames pop in LIFO order", "Final computed result returned"],
+                    "visual_focus": "Call stack unwind",
+                    "duration_seconds": 10,
+                },
+            ],
+        }
+
     # Check if this is an evaluation request
     if "evaluate the student's answer" in lower_prompt:
         is_weak = any(w in lower_prompt for w in ["never", "don't know", "dont know", "loop", "wrong", "infinite"])
@@ -150,8 +197,8 @@ Respond strictly as a JSON object with these exact keys:
   "explanation": "clear, conversational explanation tailored to the student's level and mode (concise, one concept at a time)",
   "analogy": "short real-world analogy or null if not needed",
   "example": "concrete practical/worked example or null",
-  "diagram_title": "short title if a diagram helps, else null",
-  "diagram_mermaid": "valid Mermaid flowchart/graph/sequenceDiagram code using plain ASCII labels (quote labels with parentheses/special chars) or null",
+  "diagram_title": "short title if an illustrative diagram helps, else null",
+  "diagram_mermaid": "RAW Mermaid diagram code ONLY (must start directly with 'flowchart TD' or 'graph TD' or 'sequenceDiagram'; NEVER include introductory prose, bullet points, or markdown backticks; ALWAYS wrap bracket labels with parentheses, equals, or numbers in double quotes e.g. A[\"fact(4), n=4\"] --> B[\"fact(3), n=3\"]; use ASCII '-->' arrows) or null",
   "followup_question": "one short question to check student understanding (or guiding question in Socratic mode)",
   "insufficient_document_context": true or false
 }}"""
@@ -310,3 +357,67 @@ def transcribe_audio_bytes(file_bytes: bytes, filename: str) -> str:
         file=(filename, file_bytes),
     )
     return transcript.text.strip()
+
+
+def generate_video_walkthrough(
+    session: dict[str, Any],
+    topic: str,
+    concept: Optional[str],
+    target_duration_seconds: int,
+    retrieved_chunks: list[dict[str, Any]],
+) -> dict[str, Any]:
+    system_prompt = (
+        "You are LearnMate's Master Educational Animator and Explainer Video Director. "
+        "Your mission is to structure a compelling, step-by-step whiteboard animated video explanation "
+        "(inspired by 3Blue1Brown, Khan Academy, and CrashCourse) to make this topic crystal clear.\n"
+        f"Subject: {session.get('subject')}\n"
+        f"Level: {session.get('learning_level')}\n"
+        f"Teaching style: {session.get('teaching_style', 'simple')}"
+    )
+
+    docs_snippet = (
+        "\n".join(c["snippet"] for c in retrieved_chunks[:3])
+        if retrieved_chunks
+        else "No specific study material."
+    )
+
+    user_prompt = f"""Create an animated whiteboard explainer video script for:
+Topic: "{topic}"
+Specific Focus: "{concept or topic}"
+Target total video duration: ~{target_duration_seconds} seconds
+
+Uploaded study reference notes:
+{docs_snippet}
+
+Structure a 3 to 5 scene animated storyboard.
+In each scene:
+- "title": Short scene heading (e.g., "Scene 1: The Initial Function Call")
+- "narration": 2-3 engaging, conversational spoken sentences explaining this exact step clearly.
+- "diagram_mermaid": Illustrative Mermaid flowchart or graph illustrating this specific step (e.g. active stack frame highlighted, node transition). Always start directly with 'flowchart TD' or 'graph TD', quote bracket labels containing parens/numbers like A[\"fact(4)\"], and use ASCII '-->'.
+- "key_points": 1-2 bullet points highlighting key insights for this scene.
+- "visual_focus": Brief label for what is in focus (e.g., "Stack frame 1 allocation").
+- "duration_seconds": Estimated duration (typically 8 to 15 seconds).
+
+Respond strictly as JSON with this exact schema:
+{{
+  "title": "Clear video title",
+  "topic": "{topic}",
+  "total_duration_seconds": {target_duration_seconds},
+  "summary": "1-2 sentence overview of what this video explains",
+  "scenes": [
+    {{
+      "scene_number": 1,
+      "title": "Scene title",
+      "narration": "Conversational narration text spoken by the AI tutor",
+      "diagram_mermaid": "flowchart TD ... (or null)",
+      "key_points": ["point 1", "point 2"],
+      "visual_focus": "focus description",
+      "duration_seconds": 10
+    }}
+  ]
+}}"""
+
+    data = _chat_json(system_prompt, user_prompt, temperature=0.35)
+    for scene in data.get("scenes", []):
+        scene["diagram_mermaid"] = sanitize_mermaid_diagram(scene.get("diagram_mermaid"))
+    return data

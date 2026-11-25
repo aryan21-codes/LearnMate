@@ -279,10 +279,22 @@ export const ZoomSessionProvider: React.FC<{ children: React.ReactNode }> = ({ c
               await attachUserVideo(me.userId);
             }
             syncParticipants();
-          } catch (vidErr) {
-            const msg = vidErr instanceof Error ? vidErr.message : String(vidErr);
+          } catch (vidErr: unknown) {
+            let msg = "Camera inaccessible";
+            if (vidErr instanceof Error) {
+              msg = vidErr.message;
+            } else if (typeof vidErr === "object" && vidErr !== null) {
+              const o = vidErr as Record<string, unknown>;
+              msg =
+                (typeof o.reason === "string" ? o.reason : null) ||
+                (typeof o.message === "string" ? o.message : null) ||
+                (typeof o.type === "string" ? o.type : null) ||
+                "Device permission blocked or no camera detected";
+            } else if (typeof vidErr === "string") {
+              msg = vidErr;
+            }
             setError(
-              `Joined Zoom room, but camera failed to start (${msg}). Check browser camera permissions.`
+              `Joined Zoom room, but camera failed to start: ${msg}. Check browser camera permissions or click Camera below to retry.`
             );
           }
         }

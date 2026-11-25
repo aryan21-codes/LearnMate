@@ -405,23 +405,72 @@ class AudioInputManager {
     }
   }
 
+  private isTutorSpeakingFlag = false;
+  private ttsKeepAliveTimer: number | null = null;
+
+  isTutorSpeaking(): boolean {
+    return this.isTutorSpeakingFlag;
+  }
+
   speakText(text: string) {
     if (!this.state.ttsEnabled || typeof window === "undefined" || !window.speechSynthesis) {
       return;
     }
     const clean = text.trim();
     if (!clean) return;
+
+    // Clear any previous timer and speech
+    if (this.ttsKeepAliveTimer) {
+      clearInterval(this.ttsKeepAliveTimer);
+      this.ttsKeepAliveTimer = null;
+    }
     window.speechSynthesis.cancel();
+
+    this.isTutorSpeakingFlag = true;
     const utterance = new SpeechSynthesisUtterance(clean);
     utterance.rate = 1.02;
     utterance.pitch = 1.0;
+
+    // Retain global reference to avoid Chromium GC bug
+    (window as unknown as Record<string, unknown>).__activeTutorUtterance = utterance;
+
+    // Chromium speech keep-alive timer
+    this.ttsKeepAliveTimer = window.setInterval(() => {
+      if (typeof window !== "undefined" && window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.resume();
+      }
+    }, 4000);
+
     utterance.onstart = () => this.emit({ isSpeakingTTS: true });
-    utterance.onend = () => this.emit({ isSpeakingTTS: false });
-    utterance.onerror = () => this.emit({ isSpeakingTTS: false });
+    utterance.onend = () => {
+      this.isTutorSpeakingFlag = false;
+      if (this.ttsKeepAliveTimer) {
+        clearInterval(this.ttsKeepAliveTimer);
+        this.ttsKeepAliveTimer = null;
+      }
+      delete (window as unknown as Record<string, unknown>).__activeTutorUtterance;
+      this.emit({ isSpeakingTTS: false });
+    };
+    utterance.onerror = () => {
+      this.isTutorSpeakingFlag = false;
+      if (this.ttsKeepAliveTimer) {
+        clearInterval(this.ttsKeepAliveTimer);
+        this.ttsKeepAliveTimer = null;
+      }
+      delete (window as unknown as Record<string, unknown>).__activeTutorUtterance;
+      this.emit({ isSpeakingTTS: false });
+    };
+
     window.speechSynthesis.speak(utterance);
   }
 
   stopSpeaking() {
+    this.isTutorSpeakingFlag = false;
+    if (this.ttsKeepAliveTimer) {
+      clearInterval(this.ttsKeepAliveTimer);
+      this.ttsKeepAliveTimer = null;
+    }
+    delete (window as unknown as Record<string, unknown>).__activeTutorUtterance;
     if (typeof window !== "undefined" && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }

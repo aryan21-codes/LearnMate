@@ -8,6 +8,7 @@ import type {
   TutorMode,
   TutorSession,
   UserProfile,
+  VideoWalkthroughResponse,
 } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -222,4 +223,15 @@ export const api = {
       body: form,
     });
   },
+
+  createVideoWalkthrough: async (payload: {
+    session_id: string;
+    topic?: string;
+    concept?: string;
+    target_duration_seconds?: number;
+  }): Promise<VideoWalkthroughResponse> =>
+    request<VideoWalkthroughResponse>("/api/tutor/video-walkthrough", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 };
